@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { createDeck } from './game-utils';
-    import type { CardData } from './game-utils';
+    import { createDeck, getGameRecord, setGameRecord } from './game-utils';
+    import type { CardData, GameRecord } from './game-utils';
     import Card from "./Card.svelte";
     import { scale } from 'svelte/transition';
     import { confetti } from '@neoconfetti/svelte';
@@ -15,7 +15,19 @@
     let deck = $state(createDeck(size));
     let foundCards = $state(0);
     let won = $derived((foundCards == deck.length) ? true : false);
-    
+    let newRecord = $derived.by(() => {
+        if (!won) return false;
+
+        const record: GameRecord | null = getGameRecord(size);
+
+        if (record === null || (elapsed < record.elapsed && steps < record.steps)) {
+            setGameRecord(size, elapsed, elapsedStr, steps);
+            return true;
+        }
+        return false;
+    });
+    let gameRecord = getGameRecord(size);
+
     const selectedCards: CardData[] = [];
 
     function onCardClicked(index: number) {
@@ -54,10 +66,16 @@
 
 <div class="game">
     <aside class="stats">
+        {#if gameRecord}
+            <h2>🏅 {gameRecord.steps} steps in {gameRecord.elapsedStr}</h2>
+        {/if}
         <h2>Time: {elapsedStr}</h2>
         <h2>Steps: {steps}</h2>
         {#if won}
             <h1 transition:scale>You won!</h1>
+            {#if newRecord}
+                <h3 transition:scale>🏆 New record! 🏆</h3>
+            {/if}
             <button transition:scale class="action" onclick={ onGameReset }>Return to title</button>
         {/if}
     </aside>
@@ -95,9 +113,14 @@
         font-style: normal;
         font-size: 3.5rem;
         align-self: center;
+        margin: 2rem 0;
     }
     h2 {
         color: #ec9f5c;
+    }
+    h3 {
+        margin: 0 0 2rem;
+        align-self: center;
     }
     .game {
         display: flex;

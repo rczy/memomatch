@@ -1,3 +1,5 @@
+import { browser } from '$app/environment';
+
 function getSymbols(): string[] {
     const symbols = [];
     for (let i = 33; i <= 126; i++) {
@@ -24,4 +26,25 @@ export function createDeck(size: number): CardData[] {
         return {symbol: el, flipped: false};
     });
     return shuffle(deck);
+}
+
+export interface GameRecord {
+    elapsed: number;
+    elapsedStr: string;
+    steps: number;
+}
+
+export function getGameRecord(size: number): GameRecord | null {
+    if (!browser) {
+        return null;
+    }
+    const record = localStorage?.getItem(`record_${size}`);
+    return (record !== null) ? JSON.parse(record) : null;
+}
+
+export function setGameRecord(size: number, elapsed: number, elapsedStr: string, steps: number) {
+    if (!browser) {
+        return;
+    }
+    localStorage?.setItem(`record_${size}`, JSON.stringify({elapsed, elapsedStr, steps}));
 }
