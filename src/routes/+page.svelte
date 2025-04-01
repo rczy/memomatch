@@ -16,6 +16,9 @@
 
 <div class="container">
     {#if !gameStarted}
+        <a class="repo-link" target="_blank" href="https://github.com/rczy/memomatch" transition:fly={{x: 10, y: -10}}>
+            <img src="/github-mark.svg" alt="GitHub Repository"/>
+        </a>
         <div class="wrapper" transition:fly={{y: -200}}>
             <h1>MeMoMatch</h1>
 
@@ -88,6 +91,21 @@
     input[type="number"] {
         font-size: 1.4rem;
         text-align: center;
+    }
+    a.repo-link {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    a.repo-link img {
+        width: 2.5rem;
+        transform: rotate(15deg);
+        opacity: 0.3;
+        transition: all 0.3s;
+    }
+    a.repo-link:hover img {
+        opacity: 1;
+        transform: rotate(0);
     }
     .wrapper {
         display: flex;
